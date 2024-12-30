@@ -88,28 +88,28 @@ func logMessage(address string, data interface{}, err error) {
 	defer file.Close()
 
 	// Log the message
-	logMessage := fmt.Sprintf("Data: %s, Error: %s", string(dataJson), errStr)
+	logMessage := fmt.Sprintf("[ADDRESS]: %s\t [Data]: %s\t [Error]: %s", address, string(dataJson), errStr)
 	logger.Println(logMessage)
 }
 
 func (f *server) Receive(ctx *actor.Context) {
 	switch m := ctx.Message().(type) {
 	case actor.Started:
-		slog.Info("[SERVER STARTED]", "address", ctx.PID().GetID())
+		slog.Info("[SERVER STARTED]", "[ADDRESS]", ctx.PID().GetID())
 	case *actor.PID:
-		slog.Info("[CONNECTED]", "address", ctx.PID().GetID(), "pid", m)
+		slog.Info("[CONNECTED]", "[ADDRESS]", ctx.PID().GetID(), "[PID]", m)
 	case *msg.Message:
 		data, err := decodeLogMe(m.Data)
 		if err != nil {
 
-			slog.Info("[ERROR]", "address", ctx.PID().GetID(), "error", err)
+			slog.Info("[ERROR]", "[ADDRESS]", ctx.PID().GetID(), "[ERROR]", err)
 			logMessage(ctx.PID().GetID(), nil, err)
 			break
 		}
-		slog.Info("[NEW]", "address", ctx.PID().GetID(), "msg", data)
+		slog.Info("[NEW]", "[ADDRESS]", ctx.PID().GetID(), "[MESSAGE]", data)
 		logMessage(ctx.PID().GetID(), data, nil)
 	default:
-		slog.Warn("[UNKNOWN]", "address", ctx.PID().GetID(), "msg", m, "type", reflect.TypeOf(m).String())
+		slog.Warn("[UNKNOWN]", "[ADDRESS]", ctx.PID().GetID(), "[MESSAGE]", m, "[TYPE]", reflect.TypeOf(m).String())
 	}
 }
 
